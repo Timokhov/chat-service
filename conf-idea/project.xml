@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <component name="ProjectRunConfigurationManager">
+        <configuration default="false" name="log" type="BashConfigurationType" factoryName="Bash">
+            <option name="INTERPRETER_OPTIONS" value="-c &quot;tail -f -n 500 tomcat/logs/chat-service/app.log&quot;" />
+            <option name="INTERPRETER_PATH" value="/bin/bash" />
+            <option name="WORKING_DIRECTORY" value="" />
+            <option name="PARENT_ENVS" value="true" />
+            <option name="SCRIPT_NAME" value="sh" />
+            <option name="PARAMETERS" value="" />
+            <module name="" />
+            <envs />
+            <method>
+                <option name="Make" enabled="false" />
+            </method>
+        </configuration>
+        <configuration default="false" name="debug" type="Remote" factoryName="Remote">
+            <option name="USE_SOCKET_TRANSPORT" value="true"/>
+            <option name="HOST" value="localhost"/>
+            <option name="PORT" value="8788"/>
+            <method/>
+        </configuration>
+    </component>
+    <component name="EntryPointsManager">
+        <entry_points version="2.0"/>
+        <list size="1">
+            <item index="0" class="java.lang.String" itemvalue="com.haulmont.web.log.InjectLogger"/>
+        </list>
+    </component>
+    <component name="VcsDirectoryMappings">
+        <mapping directory="" vcs="Git"/>
+    </component>
+</root>

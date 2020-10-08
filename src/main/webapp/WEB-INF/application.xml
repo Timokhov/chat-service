@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="com.timokhov.web.chat_service.services"/>
+    <context:property-placeholder/>
+    <context:annotation-config/>
+    <aop:aspectj-autoproxy/>
+
+    <!--Logger-->
+    <bean class="com.timokhov.web.chat_service.config.logger.LoggerInjector"/>
+
+    <bean name="contextPath" class="com.timokhov.web.chat_service.utils.ServerUtils" factory-method="getServletContextPath">
+        <constructor-arg name="servletContext" ref="servletContext" />
+    </bean>
+
+    <bean name="requestDelayFilter" class="com.timokhov.web.chat_service.config.logger.filters.RequestDelayFilter"/>
+    <bean name="requestDiagnosticFilter" class="com.timokhov.web.chat_service.config.logger.filters.RequestDiagnosticFilter"
+          p:logBeforeMessage="true" p:logAfterMessage="false" p:includeClientInfo="true"/>
+
+    <bean name="jmxAttributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+    <bean name="servletContextMetadataNamingStrategy" class="com.timokhov.web.chat_service.config.servlet_context.ServletContextMetadataNamingStrategy">
+        <constructor-arg name="servletContext" ref="servletContext"/>
+        <constructor-arg name="attributeSource" ref="jmxAttributeSource"/>
+    </bean>
+    <bean class="org.springframework.jmx.export.MBeanExporter">
+        <property name="namingStrategy" ref="servletContextMetadataNamingStrategy"/>
+        <property name="assembler">
+            <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+                <constructor-arg name="attributeSource" ref="jmxAttributeSource"/>
+            </bean>
+        </property>
+        <property name="autodetect" value="true"/>
+    </bean>
+    <bean class="org.springframework.jmx.export.MBeanExporter">
+        <property name="namingStrategy" ref="servletContextMetadataNamingStrategy"/>
+        <property name="assembler">
+            <bean class="org.springframework.jmx.export.assembler.MethodNameBasedMBeanInfoAssembler">
+                <property name="managedMethods" value="getDelayUrlPathMask,setDelayUrlPathMask,getDelayMills,setDelayMills"/>
+            </bean>
+        </property>
+        <property name="beans">
+            <map>
+                <entry key="ChatService:name=RequestDelayFilter" value-ref="requestDelayFilter"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+
+    <bean name="appInfoService" class="com.timokhov.web.chat_service.services.app_info.AppInfoService">
+        <!--suppress SpringModelInspection -->
+        <constructor-arg name="versionFilePath" value="com/timokhov/web/chat-service/version.properties"/>
+    </bean>
+
+    <bean name="jsonExceptionHandlingFilter" class="com.timokhov.web.chat_service.config.logger.filters.JsonExceptionHandlingFilter">
+        <constructor-arg name="jsonMessageConverter" ref="jsonMessageConverter"/>
+        <property name="logRequest" value="true" />
+    </bean>
+
+    <bean name="corsFilter" class="org.springframework.web.filter.CorsFilter">
+        <constructor-arg name="configSource">
+            <bean class="org.springframework.web.cors.UrlBasedCorsConfigurationSource">
+                <property name="alwaysUseFullPath" value="true"/>
+                <property name="corsConfigurations">
+                    <map>
+                        <entry key="/**">
+                            <bean class="org.springframework.web.cors.CorsConfiguration">
+                                <property name="allowedOrigins" value="#{serviceConfig.corsAllowedOrigins}"/>
+                                <property name="allowedMethods" value="*"/>
+                                <property name="allowedHeaders" value="*"/>
+                                <property name="allowCredentials" value="true"/>
+                            </bean>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+</beans>

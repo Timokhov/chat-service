@@ -1,0 +1,101 @@
+idea {
+    project {
+        jdkName = javaVersion
+        languageLevel = javaVersion
+
+        vcs = "Git"
+
+        ipr.withXml { xmlFile ->
+            def runConfigurationManager = xmlFile.node.component.find { it.@name == "ProjectRunConfigurationManager" }
+            if (!runConfigurationManager) {
+                runConfigurationManager = xmlFile.node.appendNode "component", [name: "ProjectRunConfigurationManager"]
+            }
+            if (!runConfigurationManager.configuration.find { it.@name == "log" }) {
+                runConfigurationManager.append new NodeBuilder().configuration(name: "log", type: "BashConfigurationType", factoryName: "Bash") {
+                    option(name: "INTERPRETER_OPTIONS", value: "-c \"tail -f -n 500 $tomcatDir/logs/$webAppName/app.log\"")
+                    option(name: "INTERPRETER_PATH", value: "/bin/bash")
+                    option(name: "PARENT_ENVS", value: "true")
+                    option(name: "SCRIPT_NAME", value: "bash")
+                    method() {
+                        option(name: "Make", enabled: "false")
+                    }
+                }
+            }
+            if (!runConfigurationManager.configuration.find { it.@name == "debug" }) {
+                runConfigurationManager.append new NodeBuilder().configuration(name: "debug", type: "Remote", factoryName: "Remote") {
+                    option (name: "USE_SOCKET_TRANSPORT", value: "true")
+                    option (name: "HOST", value: "localhost")
+                    option (name: "PORT", value: "8788")
+                }
+            }
+        }
+    }
+
+    module {
+        iml.withXml { xmlFile ->
+            xmlFile.node.component.find { it.@name == "NewModuleRootManager" } .orderEntry.findAll { it.@type == "module-library" } .library *.findAll { it.@type == null } *.each {
+                if (it.CLASSES.root[0].@url.matches(".*spring\\-core\\-[\\w\\.]+\\.jar!/")) {
+                    if (!it.ANNOTATIONS) {
+                        it.append new NodeBuilder().ANNOTATIONS {
+                            root(url: "file://\$MODULE_DIR\$/annotations")
+                        }
+                    }
+                }
+            }
+
+            def facetManager = xmlFile.node.component.find { it.@name == "FacetManager" }
+            if (!facetManager) {
+                facetManager = xmlFile.node.appendNode "component", [name: "FacetManager"]
+            }
+
+            if (!facetManager.facet.find { it.@type == "web" }) {
+                facetManager.append new NodeBuilder().facet(type: "web", name: "Web") {
+                    configuration {
+                        descriptors {
+                            deploymentDescriptor(name: "web.xml", url: "file://\$MODULE_DIR\$/src/main/webapp/WEB-INF/web.xml")
+                        }
+                        webroots {
+                            root(url: "file://\$MODULE_DIR\$/src/main/webapp", relative: "/")
+                        }
+                    }
+                }
+            }
+
+            if (!facetManager.facet.find { it.@type == "Spring" }) {
+                facetManager.append new NodeBuilder().facet(type: "Spring", name: "Spring") {
+                    configuration {}
+                }
+            }
+        }
+
+        excludeDirs += file(tomcatDir)
+    }
+
+    workspace.iws.withXml { xmlFile ->
+        def propertiesComponent = xmlFile.node.component.find { it.@name == "PropertiesComponent" }
+        if (!propertiesComponent) {
+            propertiesComponent = xmlFile.node.appendNode "component", [name: "PropertiesComponent"]
+        }
+
+        if (!propertiesComponent.property.find { it.@name == "show.inlinked.gradle.project.popup" }) {
+            propertiesComponent.appendNode "property", [name: "show.inlinked.gradle.project.popup", value: "false"]
+        }
+
+        def gitSettingsComponent = xmlFile.node.component.find { it.@name == "Git.Settings" }
+        if (!gitSettingsComponent) {
+            gitSettingsComponent = xmlFile.node.appendNode "component", [name: "Git.Settings"]
+        }
+
+        if (!gitSettingsComponent.option.find { it.@name == "UPDATE_TYPE" }) {
+            gitSettingsComponent.appendNode "option", [name: "UPDATE_TYPE", value: "REBASE"]
+        }
+
+        if (!gitSettingsComponent.option.find { it.@name == "PUSH_AUTO_UPDATE" }) {
+            gitSettingsComponent.appendNode "option", [name: "PUSH_AUTO_UPDATE", value: "true"]
+        }
+
+        if (!gitSettingsComponent.option.find { it.@name == "FORCE_PUSH_ALLOWED" }) {
+            gitSettingsComponent.appendNode "option", [name: "FORCE_PUSH_ALLOWED", value: "true"]
+        }
+    }
+}

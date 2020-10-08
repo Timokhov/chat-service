@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <component name="NamedScopeManager">
+        <scope name="Resources" pattern="file:conf//*||file:conf-local//*||file:src/main/web-resources//*" />
+    </component>
+    <component name="PropertiesComponent">
+        <property name="show.inlinked.gradle.project.popup" value="false"/>
+    </component>
+</root>

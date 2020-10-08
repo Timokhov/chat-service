@@ -1,0 +1,35 @@
+war {
+
+    def webXmlFile = file("$rootDir/src/main/webapp/WEB-INF/web.xml")
+    def webXmlText = webXmlFile.text
+
+    doFirst {
+        webXmlFile.text = webXmlFile.text.replaceAll('#\\{siteInfo}', version)
+    }
+
+    doLast {
+        webXmlFile.text = webXmlText
+    }
+}
+
+def buildNumber
+
+buildNumber = "local"
+
+processResources() {
+    dependsOn "processResourcesTaks"
+    from "$buildDir/tmp/version"
+}
+
+
+task processResourcesTaks {
+    def prop = new Properties()
+    prop.setProperty("version", version)
+    prop.setProperty("buildDate", new Date().format("dd.MM.yyyy HH:mm:ss"))
+    prop.setProperty("buildNumber", buildNumber)
+
+    def propFile = new File("$buildDir/tmp/version", versionFilePath)
+    propFile.parentFile.mkdirs()
+    propFile.createNewFile()
+    prop.store(propFile.newWriter(), null)
+}

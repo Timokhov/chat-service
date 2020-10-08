@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration monitorInterval="30" status="info">
+
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <ThresholdFilter level="WARN"/>
+            <PatternLayout pattern="%d %-5p [%X{id}] [%c{1}] %m%n"/>
+        </Console>
+        <RollingFile name="FILE"
+                     fileName="${sys:catalina.home}/logs/${web:contextPath}/app.log"
+                     filePattern="${sys:catalina.home}/logs/${web:contextPath}/app.log.%d{yyyy-MM-dd}">
+            <ThresholdFilter level="TRACE"/>
+            <PatternLayout pattern="%d %-5p [%X{id}] [%c{1}] %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger  name="com.timokhov" level="DEBUG"/>
+
+        <!-- Strip logs to INFO level for libraries -->
+
+        <Logger name="org.springframework" level="INFO"/>
+
+        <Logger name="org.apache" level="INFO"/>
+
+        <Logger name="net.sf" level="INFO"/>
+
+        <Logger name="com.sun" level="INFO"/>
+
+        <Logger name="javax" level="INFO"/>
+
+        <Logger name="freemarker" level="INFO"/>
+
+        <Logger name="springfox" level="INFO"/>
+
+        <Logger name="com.magenta.gear.metadata.loader.ClientMetadataLoader.SYSTEM" level="ERROR"/>
+
+        <Root level="DEBUG">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="FILE"/>
+        </Root>
+    </Loggers>
+</Configuration>

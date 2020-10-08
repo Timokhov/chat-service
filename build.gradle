@@ -1,0 +1,57 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+buildscript.repositories.each {
+    repositories.add(it)
+}
+
+ext {
+    //from gradle.properties
+    release = project.hasProperty("release") ? release.toBoolean() : false
+    javaVersion = project.hasProperty("javaVersion") ? javaVersion : "1.8"
+    targetDir = project.hasProperty("targetDir") ? targetDir : "$buildDir/target"
+    tomcatDir = project.hasProperty("tomcatDir") ? tomcatDir : "$projectDir/tomcat"
+
+    jdkHome = System.env["JAVA_HOME_${javaVersion.replace(".", "_")}"]
+    versionFilePath = "com/timokhov/web/chat-service/version.properties"
+
+    webAppName = "chat-service"
+}
+
+group = "com.timokhov.web"
+version = "1.0.0" + (release ? "" : "-SNAPSHOT")
+
+apply plugin: "idea"
+apply plugin: "war"
+apply plugin: "maven-publish"
+
+apply from: "build-dependencies.gradle"
+apply from: "build-war.gradle"
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 60, "seconds"
+}
+
+apply from: "build-idea.gradle"
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+if (JavaVersion.current() != javaVersion && jdkHome) {
+    tasks.withType(JavaCompile) {
+        options.fork = true
+        options.forkOptions.executable = "$jdkHome/bin/javac"
+    }
+
+    tasks.withType(Test) {
+        executable = "$jdkHome/bin/java"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
