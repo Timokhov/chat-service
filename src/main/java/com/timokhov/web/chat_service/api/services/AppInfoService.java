@@ -1,10 +1,12 @@
-package com.timokhov.web.chat_service.services.app_info;
+package com.timokhov.web.chat_service.api.services;
 
-import com.timokhov.web.chat_service.services.app_info.dto.AppInfo;
-import com.timokhov.web.chat_service.services.app_info.dto.AppVersionInfo;
+import com.timokhov.web.chat_service.api.services.dto.AppInfo;
+import com.timokhov.web.chat_service.api.services.dto.AppVersionInfo;
 import com.timokhov.web.chat_service.utils.AppVersionInfoUtils;
 import com.timokhov.web.chat_service.utils.ServerUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AppInfoService {
 
     private String versionFilePath;

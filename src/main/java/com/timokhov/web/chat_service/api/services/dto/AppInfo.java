@@ -4,7 +4,7 @@
  * Use is subject to license terms.
  */
 
-package com.timokhov.web.chat_service.services.app_info.dto;
+package com.timokhov.web.chat_service.api.services.dto;
 
 import com.timokhov.web.chat_service.config.logger.annotations.Loggable;
 

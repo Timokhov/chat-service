@@ -1,8 +1,9 @@
-package com.timokhov.web.chat_service.controllers.api;
+package com.timokhov.web.chat_service.api.controllers;
 
+import com.timokhov.web.chat_service.api.services.AppInfoService;
 import com.timokhov.web.chat_service.dto.http.DataResponse;
-import com.timokhov.web.chat_service.services.app_info.AppInfoService;
-import com.timokhov.web.chat_service.services.app_info.dto.AppInfo;
+
+import com.timokhov.web.chat_service.api.services.dto.AppInfo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

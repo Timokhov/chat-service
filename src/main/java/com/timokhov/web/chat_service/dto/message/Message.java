@@ -17,6 +17,17 @@ public class Message extends AbstractDto {
 
     private String date;
 
+    public Message() {
+    }
+
+    public Message(String id, MessageType type, User user, String text, String date) {
+        this.id = id;
+        this.type = type;
+        this.user = user;
+        this.text = text;
+        this.date = date;
+    }
+
     public String getId() {
         return id;
     }

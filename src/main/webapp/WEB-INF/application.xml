@@ -58,11 +58,6 @@
 
     <bean name="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
 
-    <bean name="appInfoService" class="com.timokhov.web.chat_service.services.app_info.AppInfoService">
-        <!--suppress SpringModelInspection -->
-        <constructor-arg name="versionFilePath" value="com/timokhov/web/chat-service/version.properties"/>
-    </bean>
-
     <bean name="jsonExceptionHandlingFilter" class="com.timokhov.web.chat_service.config.logger.filters.JsonExceptionHandlingFilter">
         <constructor-arg name="jsonMessageConverter" ref="jsonMessageConverter"/>
         <property name="logRequest" value="true" />

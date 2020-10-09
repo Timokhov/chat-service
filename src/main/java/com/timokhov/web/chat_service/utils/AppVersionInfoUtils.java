@@ -1,6 +1,6 @@
 package com.timokhov.web.chat_service.utils;
 
-import com.timokhov.web.chat_service.services.app_info.dto.AppVersionInfo;
+import com.timokhov.web.chat_service.api.services.dto.AppVersionInfo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
