@@ -1,9 +1,9 @@
 package com.timokhov.web.chat_service.web_sockets.services;
 
-import com.timokhov.web.chat_service.dto.message.Message;
-import com.timokhov.web.chat_service.dto.message.MessageType;
-import com.timokhov.web.chat_service.web_sockets.services.models.WebSocketSubscription;
+import com.timokhov.web.chat_service.dto.messages.chat.ChatMessage;
+import com.timokhov.web.chat_service.dto.messages.chat.ChatMessageType;
 import com.timokhov.web.chat_service.utils.UUIDUtils;
+import com.timokhov.web.chat_service.web_sockets.services.models.WebSocketSubscription;
 import com.timokhov.web.chat_service.utils.WebSocketsUtils;
 import org.joda.time.DateTime;
 import org.springframework.context.event.EventListener;
@@ -22,6 +22,8 @@ public class WebSocketsTopicsSubscriptionListener {
 
     @Resource
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Resource
+    private UsersTypingService usersTypingService;
 
     @Resource
     private WebSocketsSubscriptionsContainerService webSocketsSubscriptionsContainerService;
@@ -36,6 +38,10 @@ public class WebSocketsTopicsSubscriptionListener {
             if (WebSocketsUtils.CHAT_MESSAGES_TOPIC.equals(subscription.getTopic())) {
                 sendUserEnterMessage(subscription);
             }
+
+            if (WebSocketsUtils.TYPING_TOPIC.equals(subscription.getTopic())) {
+                usersTypingService.generateAndSendTypingMessage(subscription.getSessionId());
+            }
         }
     }
 
@@ -47,6 +53,10 @@ public class WebSocketsTopicsSubscriptionListener {
         if (subscription != null) {
             if (WebSocketsUtils.CHAT_MESSAGES_TOPIC.equals(subscription.getTopic())) {
                 sendUserLeaveMessage(subscription);
+            }
+
+            if (WebSocketsUtils.TYPING_TOPIC.equals(subscription.getTopic())) {
+                usersTypingService.userStopTyping(subscription.getSessionId());
             }
 
             webSocketsSubscriptionsContainerService.removeSubscription(subscription.getId());
@@ -62,30 +72,34 @@ public class WebSocketsTopicsSubscriptionListener {
             if (WebSocketsUtils.CHAT_MESSAGES_TOPIC.equals(subscription.getTopic())) {
                 sendUserLeaveMessage(subscription);
             }
+
+            if (WebSocketsUtils.TYPING_TOPIC.equals(subscription.getTopic())) {
+                usersTypingService.userStopTyping(subscription.getSessionId());
+            }
         });
         webSocketsSubscriptionsContainerService.removeSessionSubscriptions(sessionId);
     }
 
     private void sendUserEnterMessage(WebSocketSubscription subscription) {
-        Message userEnterMessage = new Message(
+        ChatMessage userEnterMessage = new ChatMessage(
                 UUIDUtils.generateUUID(),
-                MessageType.SYSTEM,
+                new DateTime().toString(),
+                ChatMessageType.SYSTEM,
                 null,
-                String.format("%s has entered the chat", subscription.getUserName()),
-                new DateTime().toString()
+                String.format("%s has entered the chat", subscription.getUserName())
         );
-        simpMessagingTemplate.convertAndSend("/topic/chat/messages", userEnterMessage);
+        simpMessagingTemplate.convertAndSend(WebSocketsUtils.CHAT_MESSAGES_TOPIC, userEnterMessage);
     }
 
     private void sendUserLeaveMessage(WebSocketSubscription subscription) {
-        Message userLeaveMessage = new Message(
+        ChatMessage userLeaveMessage = new ChatMessage(
                 UUIDUtils.generateUUID(),
-                MessageType.SYSTEM,
+                new DateTime().toString(),
+                ChatMessageType.SYSTEM,
                 null,
-                String.format("%s has left the chat", subscription.getUserName()),
-                new DateTime().toString()
+                String.format("%s has left the chat", subscription.getUserName())
         );
-        simpMessagingTemplate.convertAndSend("/topic/chat/messages", userLeaveMessage);
+        simpMessagingTemplate.convertAndSend(WebSocketsUtils.CHAT_MESSAGES_TOPIC, userLeaveMessage);
     }
 
 }

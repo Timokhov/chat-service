@@ -6,4 +6,5 @@ public class WebSocketsUtils {
 
     public static final String CHAT_MESSAGES_TOPIC = "/topic/chat/messages";
 
+    public static final String TYPING_TOPIC = "/topic/chat/typing";
 }

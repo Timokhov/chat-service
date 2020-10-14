@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class WebSocketsSubscriptionsContainerServiceImpl implements WebSocketsSubscriptionsContainerService {
 
-    private List<WebSocketSubscription> subscriptionList = new ArrayList<>();
+    private final List<WebSocketSubscription> subscriptionList = new ArrayList<>();
 
     @Override
     public void addSubscription(WebSocketSubscription subscription) {
